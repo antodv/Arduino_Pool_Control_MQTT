@@ -3,10 +3,11 @@
 
 
 //Ports
-  int voltagePin = 2;
+  
   int temperatureInPin = A0;
   int temperatureOutPin = A2;
-  int pumpRelayPin = 3;
+  int solarPanelPumpPin = 3;
+  int filterPumpPin = 2;
 
 //Serial communication
   SoftwareSerial HC12(10, 11);         // HC-12 TX Pin, HC-12 RX Pin
@@ -22,9 +23,10 @@
   float temperatureOut = 0;
   float temperatureDeltaToTurnOn = 8;
   float temperatureDeltaToTurnOff = 1;
-  float R1 = 1500;
-  float R2 = 1500;
+  float R1 = 1493;
+  float R2 = 1493;
   int voltage = 5;
+  String input; 
 
 
 void setup() {
@@ -33,10 +35,8 @@ void setup() {
   //HC12
     HC12.begin(38400);                     // Open serial port to HC12
   //Pinout
-    pinMode(voltagePin, OUTPUT);
-    pinMode(pumpRelayPin, OUTPUT);
-    digitalWrite(voltagePin, HIGH);       //used as voltage for the thermometer since no Vcc output on arduino micro
-    digitalWrite(pumpRelayPin, LOW);
+    pinMode(solarPanelPumpPin, OUTPUT);
+    digitalWrite(solarPanelPumpPin, LOW);
   //Instantiate a starting average temperature close to real temperature
     temperatureIn = measurements(temperatureInPin, voltage, R2, temperatureIn, averageArrayLength);
     temperatureIn = temperatureIn*averageArrayLength;
@@ -59,8 +59,8 @@ void loop() {
           //do nothing
         break;
       case 1: 
-          if (temperatureOut > (temperatureIn + temperatureDeltaToTurnOn)) digitalWrite(pumpRelayPin, HIGH);
-          else if (temperatureOut < (temperatureIn + temperatureDeltaToTurnOff)) digitalWrite(pumpRelayPin, LOW);
+          if (temperatureOut > (temperatureIn + temperatureDeltaToTurnOn)) digitalWrite(solarPanelPumpPin, HIGH);
+          else if (temperatureOut < (temperatureIn + temperatureDeltaToTurnOff)) digitalWrite(solarPanelPumpPin, LOW);
         break;
       }
    
@@ -87,8 +87,10 @@ float measurements(int pinToRead, int voltage, int R1, float temperatureOldAvera
 
 void readHC12() {
       HC12readBuffer = "";                      // Clear HC12readBuffer 
+      
   // ==== Storing the incoming data into a String variable
     while (HC12.available()) {                  // If HC-12 has data
+      input = HC12.readStringUntil('\n');
       incomingByte = HC12.read();               // Store each icoming byte from HC-12
       HC12readBuffer += char(incomingByte); }   // Add each byte to HC12readBuffer string variable
     delay(100);
