@@ -20,7 +20,8 @@
   int averageArrayLength = 20;
   float temperatureIn = 0;
   float temperatureOut = 0;
-  float temperatureTreshold = 8;
+  float temperatureDeltaToTurnOn = 8;
+  float temperatureDeltaToTurnOff = 1;
   float R1 = 1500;
   float R2 = 1500;
   int voltage = 5;
@@ -58,8 +59,8 @@ void loop() {
           //do nothing
         break;
       case 1: 
-          if (temperatureOut > temperatureIn + temperatureTreshold) digitalWrite(pumpRelayPin, HIGH);
-          else if (temperatureOut < temperatureIn) digitalWrite(pumpRelayPin, LOW);
+          if (temperatureOut > (temperatureIn + temperatureDeltaToTurnOn)) digitalWrite(pumpRelayPin, HIGH);
+          else if (temperatureOut < (temperatureIn + temperatureDeltaToTurnOff)) digitalWrite(pumpRelayPin, LOW);
         break;
       }
    
@@ -94,22 +95,25 @@ void readHC12() {
   // ==== Sending data from one HC-12 to another via the Serial Monitor
     while (Serial.available()) {
       HC12.write(Serial.read());}
-    if (HC12readBuffer.indexOf("solarpanelpump") > 0) {
+    if (HC12readBuffer.indexOf("solarPanelPump") > 0) {
       HC12readBuffer.replace("solarpanelpump ", "");
       solarPanelPump = HC12readBuffer.toInt();}
-    else if (HC12readBuffer.indexOf("filterpump") > 0) {
+    else if (HC12readBuffer.indexOf("filterPump") > 0) {
       HC12readBuffer.replace("filterpump ", "");
       filterPump = HC12readBuffer.toInt();}
-    else if (HC12readBuffer.indexOf("temperaturein") > 0) {
+    else if (HC12readBuffer.indexOf("temperatureIn") > 0) {
       HC12readBuffer.replace("temperaturein ", "");
       temperatureIn = HC12readBuffer.toFloat();}
-    else if (HC12readBuffer.indexOf("temperatureout") > 0) {
+    else if (HC12readBuffer.indexOf("temperatureOut") > 0) {
       HC12readBuffer.replace("temperatureout ", "");
       temperatureOut = HC12readBuffer.toFloat();}
     else if (HC12readBuffer.indexOf("automatic") > 0) {
       HC12readBuffer.replace("automatic ", "");
       automatic = HC12readBuffer.toFloat();}
-    else if (HC12readBuffer.indexOf("temperaturetreshold") > 0) {
-      HC12readBuffer.replace("temperaturetreshold ", "");
-      temperatureTreshold = HC12readBuffer.toFloat();}
+    else if (HC12readBuffer.indexOf("temperatureDeltaToTurnOn") > 0) {
+      HC12readBuffer.replace("temperatureDeltaToTurnOn ", "");
+      temperatureDeltaToTurnOn = HC12readBuffer.toFloat();}
+    else if (HC12readBuffer.indexOf("temperatureDeltaToTurnOff") > 0) {
+      HC12readBuffer.replace("temperatureDeltaToTurnOff ", "");
+      temperatureDeltaToTurnOff = HC12readBuffer.toFloat();}
 }
