@@ -6,7 +6,7 @@ I ave a pool with two pumps in parallel: 1 to filter the water and one to pump w
 Since the pump is far away from any internet connection, I used radio wave (HC12) from the arduino to an ESP8266 which is connected to internet.
 
 Required:
-- ESP8266
+- ESP8266 (use [this link ](https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/)to configure Arduino IDE: https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/)
 - Relay
 - MQTT broker
 - MQTT Client APP
@@ -14,3 +14,8 @@ Required:
 Optional for long distance:
 - Arduino
 - 2x HC-12 Wireless Transceiver Module
+
+
+
+ARDUINO IDE:
+- 
