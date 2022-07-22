@@ -7,6 +7,7 @@ Since the pump is far away from any internet connection, I used radio wave (HC12
 
 Required:
 - ESP8266 https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/ to configure Arduino IDE. Arduino + ESP8266 board -- use these switches https://createlabz.store/products/arduino-uno-wifi-r3-compatible-atmega328p-esp8266 or https://forum.arduino.cc/t/atmega328p-esp8266-wifi-tutorial/944380/2
+- alternatively, a ESP32 can be used (IDE setup: https://www.instructables.com/How-to-Set-Up-WeMos-TTgo-ESP32-Uno-D1-R32/)
 - Relay
 - MQTT broker
 - MQTT Client APP
@@ -14,8 +15,3 @@ Required:
 Optional for long distance:
 - Arduino
 - 2x HC-12 Wireless Transceiver Module
-
-
-
-ARDUINO IDE:
-- 
