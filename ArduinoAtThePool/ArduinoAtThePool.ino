@@ -5,6 +5,7 @@
 //Ports
   
   int temperatureInPin = A0;
+  int voltagePin = A1;
   int temperatureOutPin = A2;
   int solarPanelPumpPin = 3;
   int filterPumpPin = 2;
@@ -15,21 +16,24 @@
   String HC12readBuffer = "";
 
 //Variables
-  bool automatic = 0;
+  bool automatic = 1;
   int solarPanelPump = 0;
   int filterPump = 0;
   int averageArrayLength = 20;
   float temperatureIn = 0;
   float temperatureOut = 0;
-  float temperatureDeltaToTurnOn = 8;
-  float temperatureDeltaToTurnOff = 1;
-  float R1 = 1493;
-  float R2 = 1493;
-  int voltage = 5;
+  float temperatureDeltaToTurnOn = 6;
+  float temperatureDeltaToTurnOff = 2;
+  float R1 = 100300;
+  float R2 = 100300;
+  float resistanceError = 76;
+  float voltage = 5.27;
   String input; 
 
 
 void setup() {
+  //Led for feedback
+    pinMode(LED_BUILTIN, OUTPUT);
   //Serial
     Serial.begin(9600);                   // Open serial port to computer
   //HC12
@@ -40,17 +44,20 @@ void setup() {
   //Instantiate a starting average temperature close to real temperature
     temperatureIn = measurements(temperatureInPin, voltage, R2, temperatureIn, averageArrayLength);
     temperatureIn = temperatureIn*averageArrayLength;
+    temperatureOut = measurements(temperatureOutPin, voltage, R2, temperatureOut, averageArrayLength);
+    temperatureOut = temperatureOut*averageArrayLength;
 }
 
 void loop() {
   // Get The measurements  
     delay(500);
+    Serial.print("voltage " );
+    Serial.println(voltage);
+    Serial.print("Temperature Out ");
     temperatureOut = measurements(temperatureOutPin, voltage, R1, temperatureOut, averageArrayLength );
+    Serial.print("Temperature In  ");
     temperatureIn = measurements(temperatureInPin, voltage, R2, temperatureIn, averageArrayLength);
-    Serial.print("temperatureOut " );
-    Serial.println(temperatureOut);
-    Serial.print("temperatureIn ");
-    Serial.println(temperatureIn);
+
 
   //Auto or not
     switch (automatic) {
@@ -59,8 +66,8 @@ void loop() {
           //do nothing
         break;
       case 1: 
-          if (temperatureOut > (temperatureIn + temperatureDeltaToTurnOn)) digitalWrite(solarPanelPumpPin, HIGH);
-          else if (temperatureOut < (temperatureIn + temperatureDeltaToTurnOff)) digitalWrite(solarPanelPumpPin, LOW);
+          if (temperatureOut > (temperatureIn + temperatureDeltaToTurnOn)) {digitalWrite(solarPanelPumpPin, HIGH); digitalWrite(LED_BUILTIN, HIGH);}       
+          else if (temperatureOut < (temperatureIn + temperatureDeltaToTurnOff)) digitalWrite(solarPanelPumpPin, LOW);         
         break;
       }
    
@@ -79,21 +86,33 @@ float measurements(int pinToRead, int voltage, int R1, float temperatureOldAvera
     raw = analogRead(pinToRead);
     buffer = raw * voltage;
     Vout = (buffer)/1024.0;
+      Serial.print("      Vout ");
+      Serial.print(Vout);
     buffer = (voltage/Vout) - 1;
     R2= R1 * buffer;
-    temperature = 67.51 - 0.039136*R2 + 0.000007751993*R2*R2; 
+      Serial.print("    R2 ");
+      Serial.print(R2);
+    temperature = 47.51 - 0.039136*R2/resistanceError + 0.000007751993*R2/resistanceError*R2/resistanceError; 
     temperatureAverage = temperatureOldAverage + 1.00000/averageLength*(temperature - temperatureOldAverage);
+      Serial.print("    temperatureAverage ");
+      Serial.println(temperatureAverage);
     return temperatureAverage;}
 
 void readHC12() {
       HC12readBuffer = "";                      // Clear HC12readBuffer 
       
   // ==== Storing the incoming data into a String variable
-    while (HC12.available()) {                  // If HC-12 has data
+    while (HC12.available()) {    // If HC-12 has data
+      delay(2);
       input = HC12.readStringUntil('\n');
       incomingByte = HC12.read();               // Store each icoming byte from HC-12
       HC12readBuffer += char(incomingByte); }   // Add each byte to HC12readBuffer string variable
-    delay(100);
+}
+
+void writeHC12() {
+    HC12.write(automatic +","+ solarPanelPump +","+ filterPump +","+ temperatureIn +","+ temperatureOut +","+ temperatureDeltaToTurnOn +","+ temperatureDeltaToTurnOff);
+    Serial.write(automatic +","+ solarPanelPump +","+ filterPump +","+ temperatureIn +","+ temperatureOut +","+ temperatureDeltaToTurnOn +","+ temperatureDeltaToTurnOff);
+
   // ==== Sending data from one HC-12 to another via the Serial Monitor
     while (Serial.available()) {
       HC12.write(Serial.read());}
