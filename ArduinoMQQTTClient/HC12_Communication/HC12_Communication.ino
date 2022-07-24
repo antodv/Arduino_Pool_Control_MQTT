@@ -4,16 +4,15 @@
   
 //Serial communication
   SoftwareSerial HC12(10, 11);         // HC-12 TX Pin, HC-12 RX Pin
-  byte incomingByte;
+  byte dataToTransferByte;
   String HC12readBuffer = "";
 
 //Variables
   unsigned long lastCurrentTime;
   String input; 
-  int solarPanelPump = 0;
-  int filterPump = 0;
   int displayDelay = 2000;
-  struct incoming{
+
+  struct dataToTransfer{
     bool automatic;                   // 1 byte
     bool solarPanelPumpStatus;        // 1 byte
     bool filterPanelPumpStatus;       // 1 byte
@@ -23,18 +22,18 @@
     float temperatureIn;              // 4
     float temperatureOut;             // 4
     };  
-  const int lengthIncoming = 17; //with lengthIncoming the sum of the length of the datatypes in the structure
+  const int lengthdataToTransfer = 17; //with lengthdataToTransfer the sum of the length of the datatypes in the structure
      
   union inputFromPC {
-    incoming incomingDataTwo;
-    byte pcLine[lengthIncoming];
+    dataToTransfer dataToTransferDataTwo;
+    byte pcLine[lengthdataToTransfer];
   }; 
  
-//IncomingData
+//dataToTransferData
 
-  inputFromPC incomingData2;
-  incoming incomingData;
-  byte pcData[lengthIncoming];
+  inputFromPC dataToTransferData2;
+  dataToTransfer dataToTransferData;
+  byte pcData[lengthdataToTransfer];
 
 
 void setup() {
@@ -42,7 +41,7 @@ void setup() {
     Serial.begin(115200);                   // Open serial port to computer
   //HC12
     HC12.begin(38400);                     // Open serial port to HC12
-  //IncomingData
+  //dataToTransferData
 }
 
 void loop() {
@@ -63,50 +62,50 @@ void loop() {
 
 
 void readHC12() {
-   if (Serial.available() < lengthIncoming) {
+   if (Serial.available() < lengthdataToTransfer) {
      return;}
      
-   for (byte n = 0; n < lengthIncoming; n++) {
+   for (byte n = 0; n < lengthdataToTransfer; n++) {
       pcData[n] = Serial.read();}
  
    for (byte n = 0; n < 11; n++) {
-     incomingData2.pcLine[n] = pcData[n];}
+     dataToTransferData2.pcLine[n] = pcData[n];}
 
-   Serial.println("data read: " + incomingData.automatic 
-    + (String)""+ incomingData.solarPanelPumpStatus 
-    + (String)""+ incomingData.filterPanelPumpStatus
-    + (String)""+ incomingData.threeWayValveStatus 
-    + (String)""+ incomingData.temperatureDeltaToTurnOn
-    + (String)""+ incomingData.temperatureDeltaToTurnOff 
-    + (String)""+ incomingData.temperatureIn 
-    + (String)""+ incomingData.temperatureOut );
+   Serial.println("data read: " + dataToTransferData.automatic 
+    + (String)""+ dataToTransferData.solarPanelPumpStatus 
+    + (String)""+ dataToTransferData.filterPanelPumpStatus
+    + (String)""+ dataToTransferData.threeWayValveStatus 
+    + (String)""+ dataToTransferData.temperatureDeltaToTurnOn
+    + (String)""+ dataToTransferData.temperatureDeltaToTurnOff 
+    + (String)""+ dataToTransferData.temperatureIn 
+    + (String)""+ dataToTransferData.temperatureOut );
       
-  /* ==== Storing the incoming data into a String variable
+  /* ==== Storing the dataToTransfer data into a String variable
          HC12readBuffer = "";                      // Clear HC12readBuffer 
     while (HC12.available()) {    // If HC-12 has data
       delay(2);
       input = HC12.readStringUntil('\n');
-      incomingByte = HC12.read();               // Store each icoming byte from HC-12
-      HC12readBuffer += char(incomingByte); }   // Add each byte to HC12readBuffer string variable
+      dataToTransferByte = HC12.read();               // Store each icoming byte from HC-12
+      HC12readBuffer += char(dataToTransferByte); }   // Add each byte to HC12readBuffer string variable
   */
 }
 
 void writeHC12() { 
-    HC12.write(incomingData.automatic + incomingData.solarPanelPumpStatus
-    + incomingData.filterPanelPumpStatus
-    + incomingData.threeWayValveStatus 
-    + incomingData.temperatureDeltaToTurnOn
-    + incomingData.temperatureDeltaToTurnOff 
-    + incomingData.temperatureIn 
-    + incomingData.temperatureOut);   
+    HC12.write(dataToTransferData.automatic + dataToTransferData.solarPanelPumpStatus
+    + dataToTransferData.filterPanelPumpStatus
+    + dataToTransferData.threeWayValveStatus 
+    + dataToTransferData.temperatureDeltaToTurnOn
+    + dataToTransferData.temperatureDeltaToTurnOff 
+    + dataToTransferData.temperatureIn 
+    + dataToTransferData.temperatureOut);   
     Serial.print("HC12 write: ");
     Serial.println( HC12.read());
-    Serial.println("data write: " + incomingData.automatic 
-    + (String)""+ incomingData.solarPanelPumpStatus 
-    + (String)""+ incomingData.filterPanelPumpStatus
-    + (String)""+ incomingData.threeWayValveStatus 
-    + (String)""+ incomingData.temperatureDeltaToTurnOn
-    + (String)""+ incomingData.temperatureDeltaToTurnOff 
-    + (String)""+ incomingData.temperatureIn 
-    + (String)""+ incomingData.temperatureOut );
+    Serial.println("data write: " + dataToTransferData.automatic 
+    + (String)""+ dataToTransferData.solarPanelPumpStatus 
+    + (String)""+ dataToTransferData.filterPanelPumpStatus
+    + (String)""+ dataToTransferData.threeWayValveStatus 
+    + (String)""+ dataToTransferData.temperatureDeltaToTurnOn
+    + (String)""+ dataToTransferData.temperatureDeltaToTurnOff 
+    + (String)""+ dataToTransferData.temperatureIn 
+    + (String)""+ dataToTransferData.temperatureOut );
 }    
