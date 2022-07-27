@@ -91,12 +91,13 @@ void loop() {
   //send data to other arduino. If no HC12 present you can remove this code 
     //readHC12();
     unsigned long currentTime = millis()-8;
-    Serial.println(currentTime); 
     // write the data every displayDelay
       if ((currentTime - lastCurrentTime) > displayDelay)  {
         lastCurrentTime = currentTime;
-        writeHC12();}
-               
+        HC12.write("wtf gebeurd er hier");
+        //writeHC12();
+        }
+     Serial.println(HC12.read());          
   delay(500);  
 }
 
@@ -156,14 +157,15 @@ void readHC12() {
 
 void writeHC12() { 
     //HC12.println("dit is heel een test die veel te lang moet zijn");
-    HC12.println(dataset.currentStatus.automatic
-    + (String)""+ dataset.currentStatus.solarPanelPumpStatus
-    + (String)""+ dataset.currentStatus.filterPanelPumpStatus
-    + (String)""+ dataset.currentStatus.threeWayValveStatus 
-    + (String)""+ dataset.currentStatus.temperatureDeltaToTurnOn
-    + (String)""+ dataset.currentStatus.temperatureDeltaToTurnOff 
-    + (String)""+ dataset.currentStatus.temperatureIn 
-    + (String)""+ dataset.currentStatus.temperatureOut);   
+    HC12.write( 
+      /*dataset.currentStatus.automatic
+    + (String)" "+ dataset.currentStatus.solarPanelPumpStatus
+    + (String)" "+ dataset.currentStatus.filterPanelPumpStatus
+    + (String)" "+ dataset.currentStatus.threeWayValveStatus 
+    + (String)" "+ dataset.currentStatus.temperatureDeltaToTurnOn
+    + (String)" "+ dataset.currentStatus.temperatureDeltaToTurnOff 
+    + (String)" "+ dataset.currentStatus.temperatureIn 
+    + (String)" "+ dataset.currentStatus.temperatureOut*/ "wtf gebeurd er hier");   
     Serial.println("data written: " + dataset.currentStatus.automatic 
     + (String)""+ dataset.currentStatus.solarPanelPumpStatus 
     + (String)""+ dataset.currentStatus.filterPanelPumpStatus

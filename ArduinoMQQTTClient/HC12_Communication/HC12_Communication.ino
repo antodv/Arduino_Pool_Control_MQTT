@@ -48,14 +48,17 @@ void loop() {
   // Get The measurements  
     unsigned long currentTime = millis()-8;
       //Serial.println(currentTime);
-    readHC12();
+    delay(500);  
+    Serial.print("test: ");
+    Serial.println(HC12.read()); 
+    //readHC12();
   // write the data every displayDelay
     /*if ((currentTime - lastCurrentTime) > displayDelay)  {
         lastCurrentTime = currentTime;
         writeHC12();
     }
     */
-    delay(500);  
+
 }
 
 
@@ -64,17 +67,16 @@ void loop() {
 
 void readHC12() {
    if (HC12.available() < lengthdataToTransfer) {
-     Serial.println("HC12.available() is no available"); return;}
+     Serial.println("HC12.available() is NOT available"); return;}
      
    Serial.print("HC12.available() is available:  ");
    Serial.println(HC12.read());
    for (byte n = 0; n < lengthdataToTransfer; n++) {
       pcData[n] = HC12.read();}
- 
    for (byte n = 0; n < 11; n++) {
      dataToTransferData2.pcLine[n] = pcData[n];}
 
-   Serial.println("data read: " + dataToTransferData.automatic 
+   /*Serial.println("data read: " + dataToTransferData.automatic 
     + (String)""+ dataToTransferData.solarPanelPumpStatus 
     + (String)""+ dataToTransferData.filterPanelPumpStatus
     + (String)""+ dataToTransferData.threeWayValveStatus 
@@ -83,7 +85,7 @@ void readHC12() {
     + (String)""+ dataToTransferData.temperatureIn 
     + (String)""+ dataToTransferData.temperatureOut );
       
-  /* ==== Storing the dataToTransfer data into a String variable
+  // ==== Storing the dataToTransfer data into a String variable
          HC12readBuffer = "";                      // Clear HC12readBuffer 
     while (HC12.available()) {    // If HC-12 has data
       delay(2);
