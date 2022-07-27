@@ -38,22 +38,23 @@
 
 void setup() {
   //Serial
-    Serial.begin(115200);                   // Open serial port to computer
+    Serial.begin(9600);                   // Open serial port to computer
   //HC12
-    HC12.begin(38400);                     // Open serial port to HC12
+    HC12.begin(9600);                     // Open serial port to HC12
   //dataToTransferData
 }
 
 void loop() {
   // Get The measurements  
     unsigned long currentTime = millis()-8;
-      Serial.println(currentTime);
+      //Serial.println(currentTime);
     readHC12();
   // write the data every displayDelay
-    if ((currentTime - lastCurrentTime) > displayDelay)  {
+    /*if ((currentTime - lastCurrentTime) > displayDelay)  {
         lastCurrentTime = currentTime;
         writeHC12();
     }
+    */
     delay(500);  
 }
 
@@ -62,11 +63,13 @@ void loop() {
 
 
 void readHC12() {
-   if (Serial.available() < lengthdataToTransfer) {
-     return;}
+   if (HC12.available() < lengthdataToTransfer) {
+     Serial.println("HC12.available() is no available"); return;}
      
+   Serial.print("HC12.available() is available:  ");
+   Serial.println(HC12.read());
    for (byte n = 0; n < lengthdataToTransfer; n++) {
-      pcData[n] = Serial.read();}
+      pcData[n] = HC12.read();}
  
    for (byte n = 0; n < 11; n++) {
      dataToTransferData2.pcLine[n] = pcData[n];}
@@ -91,15 +94,14 @@ void readHC12() {
 }
 
 void writeHC12() { 
-    HC12.write(dataToTransferData.automatic + dataToTransferData.solarPanelPumpStatus
-    + dataToTransferData.filterPanelPumpStatus
-    + dataToTransferData.threeWayValveStatus 
-    + dataToTransferData.temperatureDeltaToTurnOn
-    + dataToTransferData.temperatureDeltaToTurnOff 
-    + dataToTransferData.temperatureIn 
-    + dataToTransferData.temperatureOut);   
-    Serial.print("HC12 write: ");
-    Serial.println( HC12.read());
+    HC12.println(dataToTransferData.automatic 
+    + (String)""+ dataToTransferData.solarPanelPumpStatus
+    + (String)""+ dataToTransferData.filterPanelPumpStatus
+    + (String)""+ dataToTransferData.threeWayValveStatus 
+    + (String)""+ dataToTransferData.temperatureDeltaToTurnOn
+    + (String)""+ dataToTransferData.temperatureDeltaToTurnOff 
+    + (String)""+ dataToTransferData.temperatureIn 
+    + (String)""+ dataToTransferData.temperatureOut);   
     Serial.println("data write: " + dataToTransferData.automatic 
     + (String)""+ dataToTransferData.solarPanelPumpStatus 
     + (String)""+ dataToTransferData.filterPanelPumpStatus

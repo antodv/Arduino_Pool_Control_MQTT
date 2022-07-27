@@ -10,7 +10,7 @@
   int filterPumpPin = 1;
 
 //Serial communication
-  SoftwareSerial HC12(1, 0);         // HC-12 RX Pin, HC-12 TX Pin
+  SoftwareSerial HC12(10, 11);         // HC-12 RX Pin, HC-12 TX Pin
   //byte incomingByte;
   //String HC12readBuffer = "";
   //String input; 
@@ -45,9 +45,9 @@
 
 void setup() {
   //Serial
-    Serial.begin(115200);                   // Open serial port to computer
+    Serial.begin(9600);                   // Open serial port to computer
   //HC12
-    HC12.begin(38400);                     // Open serial port to HC12
+    HC12.begin(9600);                     // Open serial port to HC12
   //Pinout
     pinMode(solarPanelPumpPin, OUTPUT);
     digitalWrite(solarPanelPumpPin, HIGH);
@@ -70,7 +70,6 @@ void loop() {
     dataset.currentStatus.temperatureOut = measurements(temperatureOutPin, voltage, R1, dataset.currentStatus.temperatureOut, averageArrayLength );
     Serial.print("temperatureIn  ");
     dataset.currentStatus.temperatureIn = measurements(temperatureInPin, voltage, R2, dataset.currentStatus.temperatureIn, averageArrayLength);
-  
   //actions
     switch (dataset.currentStatus.automatic) {
       // out, not automatic
@@ -90,9 +89,9 @@ void loop() {
     nanReset();
 
   //send data to other arduino. If no HC12 present you can remove this code 
+    //readHC12();
     unsigned long currentTime = millis()-8;
     Serial.println(currentTime); 
-    readHC12();
     // write the data every displayDelay
       if ((currentTime - lastCurrentTime) > displayDelay)  {
         lastCurrentTime = currentTime;
@@ -127,11 +126,11 @@ void nanReset() {
 }
 
 void readHC12() {
-   if (Serial.available() < lengthdataToTransfer) {
+   if (HC12.available() < lengthdataToTransfer) {
      return;}
      
    for (byte n = 0; n < lengthdataToTransfer; n++) {
-     pcData[n] = Serial.read();}
+     pcData[n] = HC12.read();}
  
    for (byte n = 0; n < 11; n++) {
      dataset.pcLine[n] = pcData[n];}
@@ -156,17 +155,15 @@ void readHC12() {
 }
 
 void writeHC12() { 
-    HC12.write(dataset.currentStatus.automatic);
-    /* 
-    + dataset.currentStatus.solarPanelPumpStatus
-    + dataset.currentStatus.filterPanelPumpStatus
-    + dataset.currentStatus.threeWayValveStatus 
-    + dataset.currentStatus.temperatureDeltaToTurnOn
-    + dataset.currentStatus.temperatureDeltaToTurnOff 
-    + dataset.currentStatus.temperatureIn 
-    + dataset.currentStatus.temperatureOut);*/   
-    Serial.print("HC12 write: ");
-    Serial.println(HC12.read());
+    //HC12.println("dit is heel een test die veel te lang moet zijn");
+    HC12.println(dataset.currentStatus.automatic
+    + (String)""+ dataset.currentStatus.solarPanelPumpStatus
+    + (String)""+ dataset.currentStatus.filterPanelPumpStatus
+    + (String)""+ dataset.currentStatus.threeWayValveStatus 
+    + (String)""+ dataset.currentStatus.temperatureDeltaToTurnOn
+    + (String)""+ dataset.currentStatus.temperatureDeltaToTurnOff 
+    + (String)""+ dataset.currentStatus.temperatureIn 
+    + (String)""+ dataset.currentStatus.temperatureOut);   
     Serial.println("data written: " + dataset.currentStatus.automatic 
     + (String)""+ dataset.currentStatus.solarPanelPumpStatus 
     + (String)""+ dataset.currentStatus.filterPanelPumpStatus
